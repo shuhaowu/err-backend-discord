@@ -33,7 +33,7 @@ class DiscordPerson(discord.User, Person):
 
     @property
     def aclattr(self) -> str:
-        return self.id
+        return "@{}".format(self.id)
 
     @property
     def nick(self) -> str:
