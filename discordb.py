@@ -169,6 +169,8 @@ class DiscordBackend(ErrBot):
         for channel in self.client.get_all_channels():
             log.debug('Found channel: %s', channel)
 
+        self.connect_callback()
+
     @asyncio.coroutine
     def on_message(self, msg: discord.Message):
         err_msg = Message(msg.content)
@@ -296,7 +298,6 @@ class DiscordBackend(ErrBot):
         return response
 
     def serve_once(self):
-        self.connect_callback()
         # Hehe client.run cannot be used as we need more control.
         try:
             self.client.loop.run_until_complete(self.client.start(self.token))
