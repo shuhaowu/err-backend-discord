@@ -6,6 +6,7 @@ import logging
 import sys
 import discord
 import asyncio
+import signal
 
 # Can't use __name__ because of Yapsy
 log = logging.getLogger('errbot.backends.discord')
@@ -299,6 +300,8 @@ class DiscordBackend(ErrBot):
 
     def serve_once(self):
         # Hehe client.run cannot be used as we need more control.
+        self.client.loop.add_signal_handler(signal.SIGTERM, self.handle_stop)
+        self.client.loop.add_signal_handler(signal.SIGINT, self.handle_stop)
         try:
             self.client.loop.run_until_complete(self.client.start(self.token))
         except KeyboardInterrupt:
@@ -316,6 +319,10 @@ class DiscordBackend(ErrBot):
                 pass
             self.disconnect_callback()
             return True
+
+    def handle_stop(self):
+        # Pretty hacky way to do this as I don't really understand asyncio..
+        raise KeyboardInterrupt
 
     def change_presence(self, status, message):
         log.debug('Presence changed to %s and game "%s".' % (status, message))
